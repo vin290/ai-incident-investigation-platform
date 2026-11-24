@@ -1,22 +1,50 @@
-name: My First CI Workflow
+name: AI Incident Investigation CI
 
 on:
   push:
     branches: [main]
+
   pull_request:
     branches: [main]
+
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
-  demo-job:
+  backend-ci:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Print message
-        run: echo "GitHub Actions is running"
+      - name: Checkout source code
+        uses: actions/checkout@v4
 
-      - name: Check Node.js version
-        run: node --version
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '26.12.1'
 
-      - name: Check npm version
-        run: npm --version
+      - name: Install backend dependencies
+        working-directory: backend
+        run: npm ci
+
+  frontend-ci:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '26.12.1'
+
+      - name: Install frontend dependencies
+        working-directory: frontend
+        run: npm ci
+
+      - name: Build frontend
+        working-directory: frontend
+        run: npm run build
