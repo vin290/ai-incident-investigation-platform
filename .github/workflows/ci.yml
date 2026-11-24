@@ -1,0 +1,22 @@
+name: My First CI Workflow
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  demo-job:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Print message
+        run: echo "GitHub Actions is running"
+
+      - name: Check Node.js version
+        run: node --version
+
+      - name: Check npm version
+        run: npm --version
