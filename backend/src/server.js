@@ -3,6 +3,8 @@ import { connectDb } from "./config/db.js";
 import redis from "./config/redis.js";
 import qdrant from "./config/qdrant.js";
 
+import { ensureQdrantCollection } from "./services/qdrant.service.js";
+
 const PORT = process.env.PORT || 5000;
 
 const startServer = async () => {
@@ -18,6 +20,9 @@ const startServer = async () => {
 
 console.log("Qdrant connected");
 console.log("Qdrant collections:", collections.collections);
+
+
+await ensureQdrantCollection();
 
     // 3. Start Express
     app.listen(PORT, () => {

@@ -4,6 +4,9 @@ import { connectDb } from "../config/db.js";
 import Document from "../models/Document.js";
 import { extractText } from "../services/documentParser.service.js";
 import  {chunkText} from "../services/chunk.service.js";
+import { generateEmbeddings } from "../services/embedding.services.js";
+import { storeChunk } from "../services/qdrant.service.js";
+import crypto from "crypto";
 dotenv.config();
 
 const connection = {
@@ -44,6 +47,44 @@ const chunks = chunkText(text);
 console.log("Total chunks:", chunks.length);
 
 console.log("First chunk:", chunks[0]);
+
+//let firstChunk=chunks[0];
+
+//const vector = await generateEmbeddings(firstChunk.text);
+
+
+
+if (chunks.length === 0) {
+  throw new Error("No chunks generated");
+}
+
+const {  userId } = job.data;
+
+if (!userId) {
+  throw new Error("userId missing from job data");
+}
+
+for (const chunk of chunks) {
+  const vector = await generateEmbeddings(chunk.text);
+
+  await storeChunk({
+    id: crypto.randomUUID(),
+    vector,
+    text: chunk.text,
+    documentId,
+    userId,
+    chunkIndex: chunk.index,
+  });
+
+  console.log(
+    `Chunk ${chunk.index + 1}/${chunks.length} stored in Qdrant`
+  );
+}
+
+
+
+
+console.log("First chunk stored in Qdrant");
 
 if (chunks.length > 1) {
   console.log("Second chunk:", chunks[1]);
