@@ -25,6 +25,7 @@ await documentQueue.add(
   "process-document",
   {
     documentId: document._id.toString(),
+     userId: req.user.userId,
     filePath: document.filePath,
     mimeType: document.mimeType,
   },
